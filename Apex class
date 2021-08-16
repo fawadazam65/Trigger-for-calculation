@@ -1,0 +1,69 @@
+public class Totalvalue {
+    public  static  decimal sumValue  =0;
+    public  static  Boolean RunOnce  =true;
+    public static list <string> appointment_Id =new list<string>();
+     public static Decimal   sum=0;
+    public static Decimal   all_Sum=0;
+    
+   public static void Sum(list <Appointment__c> newList){
+        Boolean Flag  =false;
+        list<Appointment__c> appoint_List = new  list<Appointment__c>();
+        
+        list<Appointment__c> acc = new  list<Appointment__c>();
+        for( Appointment__c ap: [select id , name,total_Fund__c, daily_Fund__c from Appointment__c]){
+            if(ap.total_Fund__c>2000){
+                sum=0;
+                Flag=true;
+               
+                appointment_Id.add(ap.Id);
+            } else{
+                
+                sum += ap.daily_Fund__c;
+               
+                
+            }
+        }
+        
+        if(Flag==true){
+            
+            for( Appointment__c newAp: [select id , name,daily_Fund__c, total_Fund__c from Appointment__c where id Not IN:appointment_Id]){
+                sum += newAp.daily_Fund__c;
+               
+            }
+        }
+        for(Appointment__c cc:newList){
+            
+            all_Sum=sum +cc.Salary__c;
+        }
+        for( Appointment__c  all_ApList : [select id, total_Fund__c from Appointment__c ]){
+            if(all_ApList.total_Fund__c <2000){
+                all_ApList.total_Fund__c=all_Sum;
+                
+                appoint_List.add(all_ApList);
+                
+            }
+        }
+        update(appoint_List);
+        
+        
+        list<Appointment__c> ac = new  list<Appointment__c>();   
+        for(Appointment__c cc:newList){
+            
+            cc.total__c=sum +cc.daily_Fund__c;
+            sumValue=cc.total_Fund__c;
+         
+            
+        }
+        if(Flag==true){
+            for( Appointment__c new_Appointment: [select id , name,daily_Fund__c, total_Fund__c from Appointment__c where id Not IN:appointment_Id]){
+                
+                new_Appointment.total_Fund__c= sumValue;     
+                ac.add(new_Appointment);
+               
+            }
+            
+            update ac;
+        }
+        
+    }
+}
